@@ -7,6 +7,7 @@ import java.net.Socket;
 /**
  * @auther Steven J
  * @createDate 2019-09-24  11:01
+ * open speedtest.tele2.net
  */
 public class MyFTP {
     private Socket client01;
@@ -48,8 +49,8 @@ public class MyFTP {
     }
 
     public void start(){
-
-
+        /**给服务器发送数据*/
+        new Thread(new SendToServer(client01,inetAdde,br)).start();
         /**从服务器读取数据*/
         new Thread(new ReceiveFromServer(client01)).start();
     }
@@ -79,9 +80,7 @@ class ReceiveFromServer implements Runnable {
             BufferedReader is = new BufferedReader(new InputStreamReader(is1, "utf8"));
             String feedBack;
             while ((feedBack = is.readLine()) != null) {
-                System.out.println("断点1");
                 System.out.println(feedBack);
-                System.out.println("断点2");
             }
 
         } catch (IOException e) {
@@ -94,9 +93,11 @@ class SendToServer implements Runnable{
     private Socket client01;
     private InetAddress inetAdde;
     private OutputStream os;
-    public SendToServer(Socket client01,InetAddress inetAdde) {
+    private BufferedReader br;
+    public SendToServer(Socket client01,InetAddress inetAdde,BufferedReader br) {
         this.client01=client01;
         this.inetAdde=inetAdde;
+        this.br=br;
         try {
             os = client01.getOutputStream();
         } catch (IOException e) {
@@ -107,17 +108,28 @@ class SendToServer implements Runnable{
 
     @Override
     public void run() {
+        /**一旦建立链接就先发一个设定字符集的数据*/
+        String msg = "OPTS UTF8 ON\r\n";
+        try {
+            os.write(msg.getBytes());
+            os.flush();
+        } catch (IOException e) {
+            System.out.println("os.write失败");
+            e.printStackTrace();
+        }
         while(true){
-            /**获得键盘输入 String userin*/
-
+            /**获得键盘输入 msg*/
+            try {
+                msg = br.readLine()+"\r\n";
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
             /**发送数据*/
-
-
-            String msg = "OPTS UTF8 ON\r\n";
             try {
                 os.write(msg.getBytes());
                 os.flush();
+                System.out.println("数据发送成功");
             } catch (IOException e) {
                 System.out.println("os.write失败");
                 e.printStackTrace();
