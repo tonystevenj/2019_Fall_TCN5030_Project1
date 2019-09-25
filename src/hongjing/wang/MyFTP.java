@@ -9,83 +9,119 @@ import java.net.Socket;
  * @createDate 2019-09-24  11:01
  */
 public class MyFTP {
-
-
-    public void run() throws Exception {
-        /**获得键盘输入 String keyboardInput*/
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        System.out.print("MyFTP> ");
-        String userin = br.readLine();
-        /**分隔看看指令*/
-        String[] userins = userin.split(" ");
-        if(!userins[0].equalsIgnoreCase("open")){
-            System.out.println("指令不对");
-            return;
+    private Socket client01;
+    private InetAddress inetAdde;
+    private BufferedReader br;
+    public MyFTP() {
+        this.br = new BufferedReader(new InputStreamReader(System.in));
+        while(true){
+            System.out.print("MyFTP> ");
+            String userin = null;
+            try {
+                userin = br.readLine();
+            } catch (IOException e) {
+                System.out.println("从用户输入读取数据失败");
+                e.printStackTrace();
+            }
+            /**分隔键盘输入，查看指令 String[] userins*/
+            String[] userins = userin.split(" ");
+            if (!userins[0].equalsIgnoreCase("open")) {
+                System.out.println("指令不对");
+                continue;
+            }
+            try {
+                inetAdde = InetAddress.getByName(userins[1]);
+            } catch (Exception e) {
+                System.out.println("请输入有效服务器地址");
+                continue;
+            }
+            break;
         }
-        InetAddress inetAdde;
-        try{
-//            InetAddress inetAdde= InetAddress.getByName("speedtest.tele2.net");
-            inetAdde= InetAddress.getByName(userins[1]);
-        }catch (Exception e){
-            System.out.println("请输入有效服务器地址");
-            return;
-        }
 
-//        String keyboardInput = userin;
-//        /**判断是输入的ip地址还是URL地址
-//         * //        InetAddress a = InetAddress.getByName("speedtest.tele2.net");
-//         * //        System.out.println(a);
-//         * 得到InetAddress inetAdde
-//         * */
-
-
-        /**
-         * 创建Socket,建立连接
-         * */
-        Socket client01=null;
+        /**创建Socket,建立连接* */
         try {
-//            System.out.println("断点0.1");
-//            client01 = new Socket(inetAdde,21);
-            client01 = new Socket(inetAdde,21);
+            client01 = new Socket(inetAdde, 21);
+            System.out.println("链接成功");
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        System.out.println("断点0.2");
-//        DataOutputStream os = new DataOutputStream(client01.getOutputStream());
-        OutputStream os = client01.getOutputStream();
-        String msg = "OPTS UTF8 ON\r\n";
-//        System.out.println("断点0.3");
-        os.write(msg.getBytes());
-        os.flush();
-
-        InputStream is1 = client01.getInputStream();
-        BufferedReader is = new BufferedReader(new InputStreamReader(is1,"utf8"));
-//        System.out.println("断点2");
-//        byte[] car = new byte[5];
-        //用ArrayOutputStream来存可变字符串
-//        ByteArrayOutputStream nbnbnb =new ByteArrayOutputStream();
-//        int len;
-//        System.out.println("断点2.1");
-        String feedBack;
-//        while((len=is.read(car))!=-1) {
-        while((feedBack=is.readLine())!=null) {
-//            System.out.println("断点2.2");
-//            String str=new String(car,0,len,"UTF8");
-//            System.out.println(str);
-//            System.out.println("断点2.3");
-            System.out.println(feedBack);
-        }
-//        System.out.println("断点3");
-//        String nbnbnbMsg=nbnbnb.toString("UTF8");
-//        System.out.println(nbnbnbMsg);
-//        System.out.println("断点4");
-//		 * 3.释放资源
-        os.close();
-        is.close();
-        client01.close();
     }
-    public static void main(String[] args) throws Exception{
+
+    public void start(){
+
+
+        /**从服务器读取数据*/
+        new Thread(new ReceiveFromServer(client01)).start();
+    }
+
+
+    public static void main(String[] args) throws Exception {
         MyFTP ftp1 = new MyFTP();
-        ftp1.run();
+        ftp1.start();
+    }
+}
+
+class ReceiveFromServer implements Runnable {
+    private Socket client01;
+    InputStream is1;
+    public ReceiveFromServer(Socket c) {
+        this.client01 = c;
+    }
+
+    @Override
+    public void run() {
+        /**从服务器读取数据
+         * open speedtest.tele2.net
+         * */
+
+        try {
+            is1 = client01.getInputStream();
+            BufferedReader is = new BufferedReader(new InputStreamReader(is1, "utf8"));
+            String feedBack;
+            while ((feedBack = is.readLine()) != null) {
+                System.out.println("断点1");
+                System.out.println(feedBack);
+                System.out.println("断点2");
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+class SendToServer implements Runnable{
+    private Socket client01;
+    private InetAddress inetAdde;
+    private OutputStream os;
+    public SendToServer(Socket client01,InetAddress inetAdde) {
+        this.client01=client01;
+        this.inetAdde=inetAdde;
+        try {
+            os = client01.getOutputStream();
+        } catch (IOException e) {
+            System.out.println("创建outputstream失败");
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void run() {
+        while(true){
+            /**获得键盘输入 String userin*/
+
+
+            /**发送数据*/
+
+
+            String msg = "OPTS UTF8 ON\r\n";
+            try {
+                os.write(msg.getBytes());
+                os.flush();
+            } catch (IOException e) {
+                System.out.println("os.write失败");
+                e.printStackTrace();
+            }
+        }
     }
 }
