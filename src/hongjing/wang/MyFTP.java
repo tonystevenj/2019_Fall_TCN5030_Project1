@@ -13,9 +13,10 @@ public class MyFTP {
     private Socket client01;
     private InetAddress inetAdde;
     private BufferedReader br;
+
     public MyFTP() {
         this.br = new BufferedReader(new InputStreamReader(System.in));
-        while(true){
+        while (true) {
             System.out.print("MyFTP> ");
             String userin = null;
             try {
@@ -42,17 +43,20 @@ public class MyFTP {
         /**创建Socket,建立连接* */
         try {
             client01 = new Socket(inetAdde, 21);
-            System.out.println("链接成功");
+//            System.out.println("链接成功");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void start(){
-        /**给服务器发送数据*/
-        new Thread(new SendToServer(client01,inetAdde,br)).start();
+    public void start() {
+        ReceiveFromServer rf = new ReceiveFromServer(client01);
+        SendToServer st = new SendToServer(client01, inetAdde, br);
         /**从服务器读取数据*/
-        new Thread(new ReceiveFromServer(client01)).start();
+        new Thread(rf).start();
+        /**给服务器发送数据*/
+        new Thread(st).start();
+
     }
 
 
@@ -65,6 +69,7 @@ public class MyFTP {
 class ReceiveFromServer implements Runnable {
     private Socket client01;
     InputStream is1;
+
     public ReceiveFromServer(Socket c) {
         this.client01 = c;
     }
@@ -79,9 +84,13 @@ class ReceiveFromServer implements Runnable {
             is1 = client01.getInputStream();
             BufferedReader is = new BufferedReader(new InputStreamReader(is1, "utf8"));
             String feedBack;
+
             while ((feedBack = is.readLine()) != null) {
-                System.out.println(feedBack);
+                synchronized (client01) {
+                    System.out.println(feedBack);
+                }
             }
+
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -89,15 +98,16 @@ class ReceiveFromServer implements Runnable {
     }
 }
 
-class SendToServer implements Runnable{
+class SendToServer implements Runnable {
     private Socket client01;
     private InetAddress inetAdde;
     private OutputStream os;
     private BufferedReader br;
-    public SendToServer(Socket client01,InetAddress inetAdde,BufferedReader br) {
-        this.client01=client01;
-        this.inetAdde=inetAdde;
-        this.br=br;
+
+    public SendToServer(Socket client01, InetAddress inetAdde, BufferedReader br) {
+        this.client01 = client01;
+        this.inetAdde = inetAdde;
+        this.br = br;
         try {
             os = client01.getOutputStream();
         } catch (IOException e) {
@@ -111,21 +121,29 @@ class SendToServer implements Runnable{
         /**一旦建立链接就先发一个设定字符集的数据*/
         String msg = "OPTS UTF8 ON\r\n";
         try {
+
             os.write(msg.getBytes());
             os.flush();
         } catch (IOException e) {
             System.out.println("os.write失败");
             e.printStackTrace();
         }
-        while(true){
-            System.out.print("MyFTP> ");
+        while (true) {
+
             /**获得键盘输入 msg*/
+            // open speedtest.tele2.net
             try {
-                msg = br.readLine()+"\r\n";
-            } catch (IOException e) {
+//                Thread.yield();
+                Thread.sleep(800);
+                synchronized (client01) {
+                    System.out.print("MyFTP> ");
+                    msg = br.readLine() + "\r\n";
+                }
+
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-
+            Thread.yield();
             /**发送数据*/
             try {
                 os.write(msg.getBytes());

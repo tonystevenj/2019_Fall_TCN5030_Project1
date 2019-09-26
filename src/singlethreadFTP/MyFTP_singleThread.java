@@ -52,10 +52,11 @@ public class MyFTP_singleThread {
         SendToServer st = new SendToServer(client01,inetAdde,br);
         ReceiveFromServer rf = new ReceiveFromServer(client01);
         while (true){
-            /**给服务器发送数据*/
-            st.run();
             /**从服务器读取数据*/
             rf.run();
+            /**给服务器发送数据*/
+            st.run();
+
         }
 
     }
@@ -121,7 +122,6 @@ class ReceiveFromServer implements Runnable {
     public ReceiveFromServer(Socket c) {
         this.client01 = c;
     }
-
     @Override
     public void run() {
         /**从服务器读取数据
