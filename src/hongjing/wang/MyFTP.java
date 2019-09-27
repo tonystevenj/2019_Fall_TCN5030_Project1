@@ -10,7 +10,7 @@ import java.net.Socket;
  * open speedtest.tele2.net
  * open inet.cis.fiu.edu
  * port 10,0,0,133,18,192
- * port 10,108,5,181,18,192
+ * port 10,108,5,181,34,184
  */
 public class MyFTP {
     private Socket client01;
@@ -20,6 +20,7 @@ public class MyFTP {
     private InputStream is;
     private ReceiveFromServer rf;
     private SendToServer st;
+
 
     public void start() {
         this.br = new BufferedReader(new InputStreamReader(System.in));
@@ -154,6 +155,13 @@ class SendToServer implements Runnable {
 
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+            if(msg.startsWith("port")){
+                try {
+                    DataChannel dc = new DataChannel();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
             Thread.yield();
 
