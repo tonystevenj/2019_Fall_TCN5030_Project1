@@ -137,6 +137,26 @@ class ReceiveFromServer implements Runnable {
                 System.out.println("这是tail信息："+tail);
                 System.out.println(feedBack);
             }
+
+           /* //换个stream
+            DataInputStream di = new DataInputStream(is1);
+            while(true){
+                System.out.println("a");
+                String aa = di.readUTF();
+                System.out.println(aa);
+            }*/
+
+            /*//换个stream - inputstream
+            byte[] car = new byte[1024];
+            int len;
+            String tail="";
+            while (tail!="\r\n"){
+                len= is1.read(car);
+                String feedBack=new String(car,0,len,"UTF8");
+                tail = feedBack.substring(feedBack.length()-2);
+                System.out.println("这是tail信息："+tail);
+                System.out.println(feedBack);
+            }*/
         } catch (IOException e) {
             e.printStackTrace();
         }

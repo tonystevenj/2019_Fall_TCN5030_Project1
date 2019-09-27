@@ -135,7 +135,7 @@ class SendToServer implements Runnable {
             try {
 //                Thread.yield();
                 Thread.sleep(800);
-                synchronized (client01) {
+                synchronized (inetAdde) {
                     System.out.print("MyFTP> ");
                     msg = br.readLine() + "\r\n";
                 }
