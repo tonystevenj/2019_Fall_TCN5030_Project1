@@ -118,7 +118,7 @@ class SendToServer implements Runnable{
 
 class ReceiveFromServer implements Runnable {
     private Socket client01;
-    InputStream is1;
+    private InputStream is1;
     public ReceiveFromServer(Socket c) {
         this.client01 = c;
     }

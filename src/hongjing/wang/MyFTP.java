@@ -8,14 +8,33 @@ import java.net.Socket;
  * @auther Steven J
  * @createDate 2019-09-24  11:01
  * open speedtest.tele2.net
+ * open inet.cis.fiu.edu
+ * port 10,0,0,133,18,192
+ * port 10,108,5,181,18,192
  */
 public class MyFTP {
     private Socket client01;
     private InetAddress inetAdde;
     private BufferedReader br;
+    private OutputStream os;
+    private InputStream is;
+    private ReceiveFromServer rf;
+    private SendToServer st;
 
-    public MyFTP() {
+    public void start() {
         this.br = new BufferedReader(new InputStreamReader(System.in));
+        logIn();
+        this.rf = new ReceiveFromServer(is);
+        this.st = new SendToServer(br, os);
+        /**从服务器读取数据*/
+        new Thread(rf).start();
+        /**给服务器发送数据*/
+        new Thread(st).start();
+
+    }
+
+
+    private void logIn() {
         while (true) {
             System.out.print("MyFTP> ");
             String userin = null;
@@ -32,7 +51,7 @@ public class MyFTP {
                 continue;
             }
             try {
-                inetAdde = InetAddress.getByName(userins[1]);
+                this.inetAdde = InetAddress.getByName(userins[1]);
             } catch (Exception e) {
                 System.out.println("请输入有效服务器地址");
                 continue;
@@ -42,20 +61,29 @@ public class MyFTP {
 
         /**创建Socket,建立连接* */
         try {
-            client01 = new Socket(inetAdde, 21);
-//            System.out.println("链接成功");
+            this.client01 = new Socket(this.inetAdde, 21);
+            System.out.println("链接成功");
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
 
-    public void start() {
-        ReceiveFromServer rf = new ReceiveFromServer(client01);
-        SendToServer st = new SendToServer(client01, inetAdde, br);
-        /**从服务器读取数据*/
-        new Thread(rf).start();
-        /**给服务器发送数据*/
-        new Thread(st).start();
+        /*初始化io*/
+        try {
+            this.os = client01.getOutputStream();
+            this.is = client01.getInputStream();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //指引登陆：
+        /*System.out.println("Input your user name:");
+        StringBuilder userin= new StringBuilder("USER ");
+        try {
+            userin.append(br.readLine());
+        } catch (IOException e) {
+            System.out.println("从用户输入读取数据失败");
+            e.printStackTrace();
+        }
+        st.send(userin.toString());*/
 
     }
 
@@ -67,11 +95,10 @@ public class MyFTP {
 }
 
 class ReceiveFromServer implements Runnable {
-    private Socket client01;
-    InputStream is1;
+    private InputStream is1;
 
-    public ReceiveFromServer(Socket c) {
-        this.client01 = c;
+    public ReceiveFromServer(InputStream is1) {
+        this.is1 = is1;
     }
 
     @Override
@@ -79,19 +106,12 @@ class ReceiveFromServer implements Runnable {
         /**从服务器读取数据
          * open speedtest.tele2.net
          * */
-
         try {
-            is1 = client01.getInputStream();
-            BufferedReader is = new BufferedReader(new InputStreamReader(is1, "utf8"));
+            BufferedReader is = new BufferedReader(new InputStreamReader(this.is1, "utf8"));
             String feedBack;
-
             while ((feedBack = is.readLine()) != null) {
-                synchronized (client01) {
                     System.out.println(feedBack);
-                }
             }
-
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -99,19 +119,21 @@ class ReceiveFromServer implements Runnable {
 }
 
 class SendToServer implements Runnable {
-    private Socket client01;
-    private InetAddress inetAdde;
     private OutputStream os;
     private BufferedReader br;
 
-    public SendToServer(Socket client01, InetAddress inetAdde, BufferedReader br) {
-        this.client01 = client01;
-        this.inetAdde = inetAdde;
+    public SendToServer(BufferedReader br, OutputStream os) {
+        this.os = os;
         this.br = br;
+    }
+
+    public void send(String msg) {
+        msg = msg + "\r\n";
         try {
-            os = client01.getOutputStream();
+            byte[] sends= msg.getBytes();
+            os.write(sends);
         } catch (IOException e) {
-            System.out.println("创建outputstream失败");
+            System.out.println("os.write失败");
             e.printStackTrace();
         }
     }
@@ -119,40 +141,28 @@ class SendToServer implements Runnable {
     @Override
     public void run() {
         /**一旦建立链接就先发一个设定字符集的数据*/
-        String msg = "OPTS UTF8 ON\r\n";
-        try {
-
-            os.write(msg.getBytes());
-            os.flush();
-        } catch (IOException e) {
-            System.out.println("os.write失败");
-            e.printStackTrace();
-        }
+        String msg = "OPTS UTF8 ON";
+        send(msg);
         while (true) {
-
             /**获得键盘输入 msg*/
             // open speedtest.tele2.net
             try {
 //                Thread.yield();
                 Thread.sleep(800);
-                synchronized (inetAdde) {
-                    System.out.print("MyFTP> ");
-                    msg = br.readLine() + "\r\n";
-                }
+                System.out.print("MyFTP> ");
+                msg = br.readLine();
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
             Thread.yield();
-            /**发送数据*/
-            try {
-                os.write(msg.getBytes());
-                os.flush();
-                System.out.println("数据发送成功");
-            } catch (IOException e) {
-                System.out.println("os.write失败");
-                e.printStackTrace();
+
+            /*将键盘输入转化为指令*/
+            switch (msg) {
+
             }
+            /**发送数据*/
+            send(msg);
         }
     }
 }
