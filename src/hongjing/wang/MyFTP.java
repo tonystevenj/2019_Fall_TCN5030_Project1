@@ -9,7 +9,9 @@ import java.net.Socket;
  * @createDate 2019-09-24  11:01
  * open speedtest.tele2.net
  * open inet.cis.fiu.edu
- * port 10,0,0,133,18,192
+ * user demo
+ * pass demopass
+ * port 10,0,0,133,34,184
  * port 10,108,5,181,34,184
  */
 public class MyFTP {
@@ -159,6 +161,7 @@ class SendToServer implements Runnable {
             if(msg.startsWith("port")){
                 try {
                     DataChannel dc = new DataChannel();
+                    new Thread(dc).start();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

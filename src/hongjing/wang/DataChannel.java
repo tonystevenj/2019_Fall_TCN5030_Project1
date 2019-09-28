@@ -23,6 +23,7 @@ public class DataChannel implements Runnable{
     public void run() {
         Socket client001 = null;
         try {
+            System.out.println("等待接收链接");
             client001 = client01.accept();
             System.out.println("一个客户端建立了连接");
         } catch (IOException e) {
