@@ -137,18 +137,40 @@ public class MyFTP_Single {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        if(msg.equalsIgnoreCase("ls")){
-            portDataPort+=1;
+        String[] msgs = msg.split(" ");
+        String command = msgs[0];
+        if(command.equalsIgnoreCase("ls")){
             send(getPortInfo());
             readFromServer();
             send("nlst");
             try {
-                new DataChannel(portDataPort);
+                new DataChannel(portDataPort).DataRead();
             } catch (IOException e) {
                 e.printStackTrace();
             }
             readFromServer();
+            portDataPort+=1;
+        }else if(command.equalsIgnoreCase("cd")){
+            if(msgs.length==2){
+                msg="CWD "+msgs[1];
+                send(msg);
+            }else {
+                send(msg);
+            }
+        }else if(command.equalsIgnoreCase("get")){
+            send(getPortInfo());
+            readFromServer();
+
+
+
+            portDataPort+=1;
+        }else if(command.equalsIgnoreCase("put")){
+            send(getPortInfo());
+            readFromServer();
+
+
+
+            portDataPort+=1;
         }else{
             send(msg);
         }

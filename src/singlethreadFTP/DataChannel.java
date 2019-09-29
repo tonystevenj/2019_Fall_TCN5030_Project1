@@ -24,7 +24,7 @@ public class DataChannel {
     public DataChannel(int port) throws IOException {
         this.lisener = new ServerSocket(port);
         System.out.println("建立了新的监听端口" + port);
-        DataRead();
+
     }
 
     public void acceptClient() {
@@ -41,12 +41,6 @@ public class DataChannel {
         acceptClient();
         try {
             InputStream is = client001.getInputStream();
-            /*int len=0;
-            byte[] car = new byte[1024*64];
-            while((len=is.read(car))!=-1){
-                String msg = new String(car,0,len);
-                System.out.println(msg);
-            }*/
             // 试试用reader：
             BufferedReader br = new BufferedReader(new InputStreamReader(is, "utf8"));
             String receiveMsg;
