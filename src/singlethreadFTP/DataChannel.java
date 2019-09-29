@@ -6,22 +6,23 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.Buffer;
 
 /**
  * @auther Steven J
  * @createDate 2019-09-27  14:39
  */
 public class DataChannel implements Runnable {
-    private ServerSocket client01;
+    private ServerSocket lisener;
 
     public DataChannel() throws IOException {
-        this.client01 = new ServerSocket(8888);
+        this.lisener = new ServerSocket(8888);
         System.out.println("创建了监听段");
     }
 
     public DataChannel(int port) throws IOException {
-        this.client01 = new ServerSocket(port);
+        this.lisener = new ServerSocket(port);
+        System.out.println("建立了新的监听端口"+port);
+
     }
 
     @Override
@@ -29,7 +30,7 @@ public class DataChannel implements Runnable {
         Socket client001 = null;
         try {
             System.out.println("等待接收链接");
-            client001 = client01.accept();
+            client001 = lisener.accept();
             System.out.println("一个客户端建立了连接");
         } catch (IOException e) {
             e.printStackTrace();
@@ -50,7 +51,7 @@ public class DataChannel implements Runnable {
             }
             br.close();
             client001.close();
-            client01.close();
+            lisener.close();
             System.gc();
         } catch (IOException e) {
             e.printStackTrace();

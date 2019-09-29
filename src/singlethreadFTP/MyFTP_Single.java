@@ -143,10 +143,9 @@ public class MyFTP_Single {
             send("nlst");
             openDataChannel();
             readFromServer();
-            readFromServer();
+        }else{
+            send(msg);
         }
-        /**发送数据*/
-        send(msg);
     }
 
     private void send(String msg) {
@@ -170,7 +169,7 @@ public class MyFTP_Single {
                 .append(",").append(msgs[3])
                 .append(",").append(num1)
                 .append(",").append(num2);
-        System.out.println(msg);
+        System.out.println("GET port 信息："+msg);
         return msg.toString();
     }
     private void openDataChannel(){
