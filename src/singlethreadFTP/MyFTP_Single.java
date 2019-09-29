@@ -11,8 +11,9 @@ import java.net.Socket;
  * open inet.cis.fiu.edu
  * user demo
  * pass demopass
- * port 10,0,0,133,34,184
- * port 10,108,5,181,34,184
+ * 家里的网址： port 10,0,0,133,34,184
+ * 学校网址： port 10,108,5,181,34,184
+ * testUpload-HongjingWang.txt
  */
 public class MyFTP_Single {
     private Socket client01;
@@ -30,7 +31,6 @@ public class MyFTP_Single {
 
     public void start() {
         this.brFromKeyboard = new BufferedReader(new InputStreamReader(System.in));
-//        getServerInfo();
         TestConnect();
         readFromServer();
         /**一旦建立链接就先发一个设定字符集的数据*/
@@ -143,12 +143,51 @@ public class MyFTP_Single {
             send(getPortInfo());
             readFromServer();
             send("nlst");
+            /*try {//证明了服务器有等待机制，并不是发一次指令然后发现门关着就回去了，它会等一哈儿
+                Thread.sleep(1500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }*/
             try {
-                new DataChannel(portDataPort).DataRead();
+                new DataChannel(portDataPort).dataRead();
             } catch (IOException e) {
                 e.printStackTrace();
             }
             readFromServer();
+            portDataPort+=1;
+        }else if(command.equalsIgnoreCase("get")){
+            send(getPortInfo());
+            readFromServer();
+            if(msgs.length==2){
+                msg="RETR "+msgs[1];
+                send(msg);
+                try {
+                    new DataChannel(portDataPort).getFile(msgs[1]);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                readFromServer();
+            }else {
+                send(msg);
+            }
+            portDataPort+=1;
+        }else if(command.equalsIgnoreCase("put")){
+            send(getPortInfo());
+            readFromServer();
+            if(msgs.length==2){
+               File toUpload = new File(msgs[1]);
+               String filename = toUpload.getName();
+               msg="STOR "+filename;
+               send(msg);
+               try {
+                   new DataChannel(portDataPort).uploadFile(toUpload);
+               } catch (IOException e) {
+                   e.printStackTrace();
+               }
+               readFromServer();
+            }else {
+                send(msg);
+            }
             portDataPort+=1;
         }else if(command.equalsIgnoreCase("cd")){
             if(msgs.length==2){
@@ -157,20 +196,13 @@ public class MyFTP_Single {
             }else {
                 send(msg);
             }
-        }else if(command.equalsIgnoreCase("get")){
-            send(getPortInfo());
-            readFromServer();
-
-
-
-            portDataPort+=1;
-        }else if(command.equalsIgnoreCase("put")){
-            send(getPortInfo());
-            readFromServer();
-
-
-
-            portDataPort+=1;
+        }else if(command.equalsIgnoreCase("delete")){
+            if(msgs.length==2){
+                msg="DELE "+msgs[1];
+                send(msg);
+            }else {
+                send(msg);
+            }
         }else{
             send(msg);
         }

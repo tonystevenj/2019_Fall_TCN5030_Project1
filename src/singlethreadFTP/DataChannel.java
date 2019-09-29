@@ -1,9 +1,6 @@
 package singlethreadFTP;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -18,13 +15,11 @@ public class DataChannel {
     public DataChannel() throws IOException {
         this.lisener = new ServerSocket(8888);
         System.out.println("创建了监听段,默认端口8888");
-        DataRead();
     }
 
     public DataChannel(int port) throws IOException {
         this.lisener = new ServerSocket(port);
         System.out.println("建立了新的监听端口" + port);
-
     }
 
     public void acceptClient() {
@@ -37,7 +32,7 @@ public class DataChannel {
         }
     }
 
-    public void DataRead() {
+    public void dataRead() {
         acceptClient();
         try {
             InputStream is = client001.getInputStream();
@@ -49,14 +44,61 @@ public class DataChannel {
             }
             is.close();
             br.close();
-            client001.close();
-            lisener.close();
-            System.gc();
+            garbageCollection();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    public void getFile(String filename){
+        acceptClient();
+        try {
+            InputStream is = client001.getInputStream();
+            FileOutputStream op = new FileOutputStream(new File("F:/"+filename));
+            byte[] car = new byte[1024];
+            int len;
+            while((len=is.read(car))!=-1) {
+                op.write(car, 0, len);
+            }
+//		 * 4.释放资源
+            is.close();
+            op.close();
+            garbageCollection();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public void uploadFile(File file){
+        acceptClient();
+        try {
+            OutputStream os = client001.getOutputStream();
+            FileInputStream fi = new FileInputStream(file);
+            byte[] car=new byte[1024];
+            int len;
+            while((len=fi.read(car))!=-1) {
+                os.write(car, 0, len);
+            }
+//		 * 4.释放资源
+            os.close();
+            fi.close();
+            garbageCollection();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    private void garbageCollection(){
+        try {
+            client001.close();
+            lisener.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        System.gc();
+    }
     public void recieveFile() {
 
     }
