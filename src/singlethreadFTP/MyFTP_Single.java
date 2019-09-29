@@ -21,6 +21,8 @@ public class MyFTP_Single {
     private InputStream is;
     private BufferedReader brFromServer;
     private BufferedReader brFromKeyboard;
+    private String feedBack = "";
+    private InetAddress localAddress;
 
 
     public void start() {
@@ -80,6 +82,8 @@ public class MyFTP_Single {
             this.os = client01.getOutputStream();
             this.is = client01.getInputStream();
             this.brFromServer = new BufferedReader(new InputStreamReader(this.is, "utf8"));
+            this.localAddress = client01.getInetAddress();
+            System.out.println("哈哈" + localAddress);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -94,11 +98,17 @@ public class MyFTP_Single {
             this.os = client01.getOutputStream();
             this.is = client01.getInputStream();
             this.brFromServer = new BufferedReader(new InputStreamReader(this.is, "utf8"));
+            this.localAddress = client01.getLocalAddress();
+            System.out.println("哈哈" + localAddress);
+            send("user demo");
+            readFromServer();
+            send("pass demopass");
+            readFromServer();
+            send(getPortInfo());
+            readFromServer();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //        send("user demo");
-//        send("pass demopass");
     }
 
 
@@ -107,12 +117,7 @@ public class MyFTP_Single {
          * open speedtest.tele2.net
          * */
         try {
-            /*char[] cbuf = new char[1024];
-            int len = 0;
-            len = brFromServer.read(cbuf, 0, 1024);
-            String feedBack = new String(cbuf, 0, len);
-            System.out.println(feedBack);*/
-            String feedBack=brFromServer.readLine();
+            feedBack = brFromServer.readLine();
             System.out.println(feedBack);
 
         } catch (IOException e) {
@@ -132,9 +137,9 @@ public class MyFTP_Single {
             e.printStackTrace();
         }
 
-        switch (msg) {
-
-        }
+//        if(msg.toUpperCase().startsWith("PORT")){
+//
+//        }
         /**发送数据*/
         send(msg);
     }
@@ -148,6 +153,17 @@ public class MyFTP_Single {
             System.out.println("os.write失败");
             e.printStackTrace();
         }
+    }
+
+    private String getPortInfo() {
+        String[] msgs = this.localAddress.toString().split("\\.");
+        StringBuilder msg = new StringBuilder("PORT "+msgs[0].substring(1,msgs[0].length()));
+        msg.append(",").append(msgs[1])
+                .append(",").append(msgs[2])
+                .append(",").append(msgs[3])
+                .append(",").append("34")
+                .append(",").append("184");
+        return msg.toString();
     }
 
     public static void main(String[] args) throws Exception {
