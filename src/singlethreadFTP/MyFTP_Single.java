@@ -25,13 +25,12 @@ public class MyFTP_Single {
     private String feedBack = "";
     private InetAddress localAddress;
     private int portDataPort = 8888;
-//    private DataChannel dc;
-    private boolean firstDataCommand;
 
 
     public void start() {
         this.brFromKeyboard = new BufferedReader(new InputStreamReader(System.in));
-        TestConnect();
+//        TestConnect();
+        getServerInfo();
         readFromServer();
         /**一旦建立链接就先发一个设定字符集的数据*/
         send("OPTS UTF8 ON");
@@ -92,7 +91,7 @@ public class MyFTP_Single {
 
     }
 
-    private void TestConnect() {
+/*    private void TestConnect() {
         try {
             this.inetAddress = InetAddress.getByName("inet.cis.fiu.edu");
             this.client01 = new Socket(this.inetAddress, 21);
@@ -110,7 +109,7 @@ public class MyFTP_Single {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
 
     private void readFromServer() {
