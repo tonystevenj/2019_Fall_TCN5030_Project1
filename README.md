@@ -1,5 +1,5 @@
 # 2019_Fall_TCN5030_Project1
-##Overview:
+## Overview:
 Understand TCP socket programing by developing a simplified FTP client. You must create your own socket, and cannot use any existing FTP library. You may use Python, Java, or C++/C as the programming language.
 The client should be designed to start by typing the command:
 
@@ -8,7 +8,7 @@ myftp server-name.
 where “server-name” is the name or IP address of the server. Next, display a prompt for entering the FTP user name, followed by a prompt for entering the password.
 After a successful login, the following commands should be available in the FTP client.
 
-##Cmmand:
+## Cmmand:
 
  - 'MyFTP> ls' - List the files in the current directory on the remote server.
  - 'MyFTP> cd remote-dir' - Chane the current directory to “remote-dir” on the remote server.
