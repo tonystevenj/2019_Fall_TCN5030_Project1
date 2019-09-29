@@ -24,6 +24,8 @@ public class MyFTP_Single {
     private String feedBack = "";
     private InetAddress localAddress;
     private int portDataPort = 8888;
+//    private DataChannel dc;
+    private boolean firstDataCommand;
 
 
     public void start() {
@@ -78,13 +80,12 @@ public class MyFTP_Single {
     private void initialize() {
         try {
             this.client01 = new Socket(this.inetAddress, 21);
-
             System.out.println("Successful connected to server");
             this.os = client01.getOutputStream();
             this.is = client01.getInputStream();
             this.brFromServer = new BufferedReader(new InputStreamReader(this.is, "utf8"));
-            this.localAddress = client01.getInetAddress();
-            System.out.println("哈哈" + localAddress);
+            this.localAddress = client01.getLocalAddress();
+//            this.dc = new DataChannel(portDataPort);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -100,7 +101,7 @@ public class MyFTP_Single {
             this.is = client01.getInputStream();
             this.brFromServer = new BufferedReader(new InputStreamReader(this.is, "utf8"));
             this.localAddress = client01.getLocalAddress();
-            System.out.println("哈哈" + localAddress);
+//            this.dc = new DataChannel(portDataPort);
             send("user demo");
             readFromServer();
             send("pass demopass");
@@ -138,10 +139,15 @@ public class MyFTP_Single {
         }
 
         if(msg.equalsIgnoreCase("ls")){
+            portDataPort+=1;
             send(getPortInfo());
             readFromServer();
             send("nlst");
-            openDataChannel();
+            try {
+                new DataChannel(portDataPort);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             readFromServer();
         }else{
             send(msg);
@@ -172,15 +178,7 @@ public class MyFTP_Single {
         System.out.println("GET port 信息："+msg);
         return msg.toString();
     }
-    private void openDataChannel(){
-        DataChannel dc=null;
-        try {
-            dc = new DataChannel(portDataPort);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        new Thread(dc).start();
-    }
+
 
     public static void main(String[] args) throws Exception {
         MyFTP_Single ftp1 = new MyFTP_Single();

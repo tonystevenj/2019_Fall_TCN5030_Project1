@@ -11,23 +11,23 @@ import java.net.Socket;
  * @auther Steven J
  * @createDate 2019-09-27  14:39
  */
-public class DataChannel implements Runnable {
+public class DataChannel {
     private ServerSocket lisener;
+    Socket client001;
 
     public DataChannel() throws IOException {
         this.lisener = new ServerSocket(8888);
-        System.out.println("创建了监听段");
+        System.out.println("创建了监听段,默认端口8888");
+        DataRead();
     }
 
     public DataChannel(int port) throws IOException {
         this.lisener = new ServerSocket(port);
-        System.out.println("建立了新的监听端口"+port);
-
+        System.out.println("建立了新的监听端口" + port);
+        DataRead();
     }
 
-    @Override
-    public void run() {
-        Socket client001 = null;
+    public void acceptClient() {
         try {
             System.out.println("等待接收链接");
             client001 = lisener.accept();
@@ -35,6 +35,10 @@ public class DataChannel implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void DataRead() {
+        acceptClient();
         try {
             InputStream is = client001.getInputStream();
             /*int len=0;
@@ -44,11 +48,12 @@ public class DataChannel implements Runnable {
                 System.out.println(msg);
             }*/
             // 试试用reader：
-            BufferedReader br = new BufferedReader(new InputStreamReader(is,"utf8"));
+            BufferedReader br = new BufferedReader(new InputStreamReader(is, "utf8"));
             String receiveMsg;
-            while((receiveMsg=br.readLine())!=null){
+            while ((receiveMsg = br.readLine()) != null) {
                 System.out.println(receiveMsg);
             }
+            is.close();
             br.close();
             client001.close();
             lisener.close();
@@ -56,8 +61,6 @@ public class DataChannel implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
     }
 
     public void recieveFile() {
