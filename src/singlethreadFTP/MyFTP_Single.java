@@ -23,6 +23,7 @@ public class MyFTP_Single {
     private BufferedReader brFromKeyboard;
     private String feedBack = "";
     private InetAddress localAddress;
+    private int portDataPort = 8888;
 
 
     public void start() {
@@ -104,8 +105,7 @@ public class MyFTP_Single {
             readFromServer();
             send("pass demopass");
             readFromServer();
-            send(getPortInfo());
-            readFromServer();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -137,9 +137,14 @@ public class MyFTP_Single {
             e.printStackTrace();
         }
 
-//        if(msg.toUpperCase().startsWith("PORT")){
-//
-//        }
+        if(msg.equalsIgnoreCase("ls")){
+            send(getPortInfo());
+            readFromServer();
+            send("nlst");
+            openDataChannel();
+            readFromServer();
+            readFromServer();
+        }
         /**发送数据*/
         send(msg);
     }
@@ -156,14 +161,26 @@ public class MyFTP_Single {
     }
 
     private String getPortInfo() {
+        int num1 = portDataPort/256;
+        int num2 = portDataPort%256;
         String[] msgs = this.localAddress.toString().split("\\.");
         StringBuilder msg = new StringBuilder("PORT "+msgs[0].substring(1,msgs[0].length()));
         msg.append(",").append(msgs[1])
                 .append(",").append(msgs[2])
                 .append(",").append(msgs[3])
-                .append(",").append("34")
-                .append(",").append("184");
+                .append(",").append(num1)
+                .append(",").append(num2);
+        System.out.println(msg);
         return msg.toString();
+    }
+    private void openDataChannel(){
+        DataChannel dc=null;
+        try {
+            dc = new DataChannel(portDataPort);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        new Thread(dc).start();
     }
 
     public static void main(String[] args) throws Exception {
