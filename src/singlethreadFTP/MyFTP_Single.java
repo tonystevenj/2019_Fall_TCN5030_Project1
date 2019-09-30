@@ -37,7 +37,7 @@ public class MyFTP_Single {
         readFromServer();
         while (true) {
             keyboardToServer();
-            readFromServer();
+//            readFromServer();
         }
 
     }
@@ -91,7 +91,7 @@ public class MyFTP_Single {
 
     }
 
-/*    private void TestConnect() {
+    private void TestConnect() {
         try {
             this.inetAddress = InetAddress.getByName("inet.cis.fiu.edu");
             this.client01 = new Socket(this.inetAddress, 21);
@@ -105,11 +105,10 @@ public class MyFTP_Single {
             readFromServer();
             send("pass demopass");
             readFromServer();
-
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }*/
+    }
 
 
     private void readFromServer() {
@@ -153,6 +152,7 @@ public class MyFTP_Single {
                 e.printStackTrace();
             }
             readFromServer();
+            readFromServer();
             portDataPort+=1;
         }else if(command.equalsIgnoreCase("get")){
             send(getPortInfo());
@@ -161,14 +161,21 @@ public class MyFTP_Single {
                 msg="RETR "+msgs[1];
                 send(msg);
                 try {
-                    new DataChannel(portDataPort).getFile(msgs[1]);
+                    DataChannel dc = new DataChannel(portDataPort);
+                    readFromServer();
+                    if(feedBack.startsWith("150")){
+                        dc.getFile(msgs[1]);
+                    }else {
+                        System.out.println("File do not exist");
+//                        send("testMsg");
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                readFromServer();
             }else {
-                send(msg);
+                send("Unknown user command");
             }
+            readFromServer();
             portDataPort+=1;
         }else if(command.equalsIgnoreCase("put")){
             send(getPortInfo());
@@ -185,25 +192,42 @@ public class MyFTP_Single {
                }
                readFromServer();
             }else {
-                send(msg);
+                send("Unknown user command");
             }
+            readFromServer();
             portDataPort+=1;
         }else if(command.equalsIgnoreCase("cd")){
             if(msgs.length==2){
                 msg="CWD "+msgs[1];
                 send(msg);
             }else {
-                send(msg);
+                send("Unknown user command");
             }
+            readFromServer();
         }else if(command.equalsIgnoreCase("delete")){
             if(msgs.length==2){
                 msg="DELE "+msgs[1];
                 send(msg);
             }else {
-                send(msg);
+                send("Unknown user command");
             }
-        }else{
+            readFromServer();
+        }else if(command.equalsIgnoreCase("quit")){
             send(msg);
+            readFromServer();
+        }else if(command.equalsIgnoreCase("pwd")){
+            send("XPWD");
+            readFromServer();
+        }else if(command.equalsIgnoreCase("user")){
+
+            send(msg);
+            readFromServer();
+        }else if(command.equalsIgnoreCase("pass")){
+            send(msg);
+            readFromServer();
+        }else {
+            send("Unknown user command");
+            readFromServer();
         }
     }
 
@@ -231,8 +255,6 @@ public class MyFTP_Single {
         System.out.println("GET port 信息："+msg);
         return msg.toString();
     }
-
-
     public static void main(String[] args) throws Exception {
         MyFTP_Single ftp1 = new MyFTP_Single();
         ftp1.start();
