@@ -31,7 +31,7 @@ public class MyFTP_Single {
         this.brFromKeyboard = new BufferedReader(new InputStreamReader(System.in));
 //        TestConnect();
         getServerInfo();
-        readFromServer();
+//        readFromServer();
         /**一旦建立链接就先发一个设定字符集的数据*/
         send("OPTS UTF8 ON");
         readFromServer();
@@ -39,7 +39,6 @@ public class MyFTP_Single {
             keyboardToServer();
 //            readFromServer();
         }
-
     }
 
     /**
@@ -58,7 +57,7 @@ public class MyFTP_Single {
             }
             /**分隔键盘输入，查看指令 String[] userins*/
             String[] userins = userin.split(" ");
-            if (!userins[0].equalsIgnoreCase("open")) {
+            if (!userins[0].equalsIgnoreCase("myftp")) {
                 System.out.println("指令不对");
                 continue;
             }
@@ -70,6 +69,27 @@ public class MyFTP_Single {
             }
             initialize();
             break;
+        }
+        System.out.println("Please type in user name: ");
+        String msg = "";
+        /**获得键盘输入 msg*/
+        try {
+            msg = brFromKeyboard.readLine();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        readFromServer();
+        send("USER "+msg);
+        readFromServer();
+        if(feedBack.startsWith("331")){
+            System.out.println("pass: ");
+            try {
+                msg = brFromKeyboard.readLine();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            send("PASS "+msg);
+            readFromServer();
         }
     }
 
