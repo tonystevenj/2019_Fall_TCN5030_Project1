@@ -144,6 +144,7 @@ public class MyFTP_Single {
                     readFromServer();
                     if(feedBack.startsWith("150")){
                         dc.getFile(msgs[1]);
+                        readFromServer();
                     }else {
                         System.out.println("File do not exist");
                     }
@@ -154,10 +155,10 @@ public class MyFTP_Single {
                 send("Unknown user command");
                 readFromServer();
             }
-
             portDataPort+=1;
         }else if(command.equalsIgnoreCase("put")){
             send(getPortInfo());
+            //myftp inet.cis.fiu.edu
             readFromServer();
             if(msgs.length==2){
                File toUpload = new File(msgs[1]);
