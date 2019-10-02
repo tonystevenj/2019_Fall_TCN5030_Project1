@@ -152,8 +152,9 @@ public class MyFTP_Single {
                 }
             }else {
                 send("Unknown user command");
+                readFromServer();
             }
-            readFromServer();
+
             portDataPort+=1;
         }else if(command.equalsIgnoreCase("put")){
             send(getPortInfo());
