@@ -14,19 +14,15 @@ public class DataChannel {
 
     public DataChannel() throws IOException {
         this.lisener = new ServerSocket(8888);
-        System.out.println("创建了监听段,默认端口8888");
     }
 
     public DataChannel(int port) throws IOException {
         this.lisener = new ServerSocket(port);
-        System.out.println("建立了新的监听端口" + port);
     }
 
     public void acceptClient() {
         try {
-            System.out.println("等待接收链接");
             client001 = lisener.accept();
-            System.out.println("一个客户端建立了连接");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -36,7 +32,6 @@ public class DataChannel {
         acceptClient();
         try {
             InputStream is = client001.getInputStream();
-            // 试试用reader：
             BufferedReader br = new BufferedReader(new InputStreamReader(is, "utf8"));
             String receiveMsg;
             while ((receiveMsg = br.readLine()) != null) {
@@ -60,7 +55,6 @@ public class DataChannel {
             while((len=is.read(car))!=-1) {
                 op.write(car, 0, len);
             }
-//		 * 4.释放资源
             is.close();
             op.close();
             garbageCollection();
@@ -78,7 +72,6 @@ public class DataChannel {
             while((len=fi.read(car))!=-1) {
                 os.write(car, 0, len);
             }
-//		 * 4.释放资源
             os.close();
             fi.close();
             garbageCollection();
@@ -96,10 +89,7 @@ public class DataChannel {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         System.gc();
     }
-    public void recieveFile() {
 
-    }
 }
