@@ -40,3 +40,6 @@ Also submit a readme.txt file with the following information:
 - Operating system used: Windows/Linux
 - Programing language used: Python/Java/C++/C
 - Compiling instructions: if any (Python programs need to compiling.), command-line compiling instructions, again no netbeans/eclipse/… project files.
+
+## Test Commit 
+Rename the repository name on github, what happens to local? 
