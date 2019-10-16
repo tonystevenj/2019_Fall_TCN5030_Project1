@@ -1,4 +1,4 @@
-package hongjing.wang;
+package multiThread;
 
 import java.io.IOException;
 import java.net.ServerSocket;

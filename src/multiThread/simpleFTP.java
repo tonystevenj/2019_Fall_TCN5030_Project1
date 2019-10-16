@@ -1,4 +1,4 @@
-package hongjing.wang;
+package multiThread;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

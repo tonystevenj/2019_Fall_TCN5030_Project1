@@ -8,7 +8,7 @@ import java.net.Socket;
  * @auther Steven J
  * @createDate 2019-09-24  11:01
  * open speedtest.tele2.net
- * open inet.cis.fiu.edu
+ * myftp inet.cis.fiu.edu
  * user demo
  * pass demopass
  * port 10,0,0,133,34,184
